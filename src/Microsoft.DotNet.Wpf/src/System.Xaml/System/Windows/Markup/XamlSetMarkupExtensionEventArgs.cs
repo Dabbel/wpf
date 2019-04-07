@@ -8,18 +8,40 @@ namespace System.Windows.Markup
 {
     public class XamlSetMarkupExtensionEventArgs : XamlSetValueEventArgs
     {
+        private class MarkupExtensionWrapper : MarkupExtension
+        {
+            private readonly IMarkupExtension markupExtension;
+
+            public MarkupExtensionWrapper(IMarkupExtension markupExtension)
+            {
+                this.markupExtension = markupExtension;
+            }
+
+            public override object ProvideValue(IServiceProvider serviceProvider)
+            {
+                return markupExtension.ProvideValue(serviceProvider);
+            }
+        }
+
         public XamlSetMarkupExtensionEventArgs(XamlMember member,
             MarkupExtension value, IServiceProvider serviceProvider) :
-            base(member, value)
+            this(member, (IMarkupExtension)value, serviceProvider)
         {
             ServiceProvider = serviceProvider;
         }
 
-        public MarkupExtension MarkupExtension { get { return Value as MarkupExtension; } }
+        public XamlSetMarkupExtensionEventArgs(XamlMember member,
+            IMarkupExtension value, IServiceProvider serviceProvider) :
+            base(member, new MarkupExtensionWrapper(value))
+        {
+            ServiceProvider = serviceProvider;
+        }
+
+        public MarkupExtension MarkupExtension { get { return Value as MarkupExtensionWrapper; } }
         public IServiceProvider ServiceProvider { get; private set; }
 
         internal XamlSetMarkupExtensionEventArgs(XamlMember member,
-            MarkupExtension value, IServiceProvider serviceProvider, object targetObject)
+            IMarkupExtension value, IServiceProvider serviceProvider, object targetObject)
             : this(member, value, serviceProvider)
         {
             TargetObject = targetObject;

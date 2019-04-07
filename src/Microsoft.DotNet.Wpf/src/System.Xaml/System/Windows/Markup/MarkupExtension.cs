@@ -11,7 +11,7 @@ namespace System.Windows.Markup
     ///  be instantiated.
     /// </summary>
     [TypeForwardedFrom("WindowsBase, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35")]
-    public abstract class MarkupExtension 
+    public abstract class MarkupExtension : IMarkupExtension
     {
         /// <summary>
         ///  Return an object that should be set on the targetObject's targetProperty
@@ -23,6 +23,11 @@ namespace System.Windows.Markup
         /// </returns>
         public abstract object ProvideValue(IServiceProvider serviceProvider);
        
+    }
+
+    public interface IMarkupExtension
+    {
+        object ProvideValue(IServiceProvider serviceProvider);
     }
 }
 
